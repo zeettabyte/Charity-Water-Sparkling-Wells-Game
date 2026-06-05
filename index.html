@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charity: Water — Sparkling Wells</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(#87CEEB, #e6f7ff);
+  text-align: center;
+}
+
+/* START SCREEN */
+#startScreen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#startBtn {
+  background: #FFC700;
+  border: none;
+  padding: 15px 30px;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+/* GAME UI */
+#game {
+  display: none;
+  padding: 10px;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  font-weight: bold;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 60px);
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.tile {
+  width: 60px;
+  height: 60px;
+  background: #7ed957;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+/* WELL */
+.well {
+  background: #4FCB53;
+}
+
+.well::after {
+  content: "💧";
+  font-size: 24px;
+  position: absolute;
+  top: 15px;
+  left: 18px;
+}
+
+/* EFFECT */
+.tile:active {
+  transform: scale(0.9);
+}
+
+/* PROGRESS BAR */
+.progress {
+  width: 80%;
+  margin: 10px auto;
+  background: #ddd;
+  border-radius: 20px;
+}
+
+.progress-fill {
+  height: 20px;
+  width: 0%;
+  background: #00A19D;
+  border-radius: 20px;
+}
+
+/* END SCREEN */
+#endScreen {
+  display: none;
+  padding: 20px;
+}
+
+button {
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen">
+  <img src="/mnt/data/charitywater_logo_horizontal_AllWhite.png" width="200">
+  <h1>Charity: Water — Sparkling Wells</h1>
+  <p>Help bring clean water to communities 💧</p>
+  <button id="startBtn">Start Game</button>
+</div>
+
+<!-- GAME -->
+<div id="game">
+
+  <div class="topBar">
+    <div>Score: <span id="score">0</span></div>
+    <div>People Helped: <span id="people">0</span></div>
+  </div>
+
+  <div class="progress">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <p>Every click helps raise awareness for clean water access 💧</p>
+
+</div>
+
+<!-- END SCREEN -->
+<div id="endScreen">
+  <h2>You helped provide clean water to a community! 🎉</h2>
+  <p id="finalScore"></p>
+
+  <button onclick="restartGame()">Play Again</button>
+
+  <br><br>
+
+  <a href="https://www.charitywater.org" target="_blank">
+    <button style="background:#FFC700;padding:10px 20px;border:none;border-radius:8px;">
+      Donate to charity: water
+    </button>
+  </a>
+</div>
+
+<script>
+let score = 0;
+let people = 0;
+const grid = document.getElementById("grid");
+const scoreEl = document.getElementById("score");
+const peopleEl = document.getElementById("people");
+const progressFill = document.getElementById("progressFill");
+
+document.getElementById("startBtn").onclick = () => {
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("game").style.display = "block";
+  createGrid();
+};
+
+function createGrid() {
+  grid.innerHTML = "";
+
+  for (let i = 0; i < 25; i++) {
+    const tile = document.createElement("div");
+    tile.classList.add("tile");
+
+    if (Math.random() < 0.3) {
+      tile.classList.add("well");
+
+      tile.onclick = () => {
+        collectWater(tile);
+      };
+    }
+
+    grid.appendChild(tile);
+  }
+}
+
+function collectWater(tile) {
+  score += 10;
+  scoreEl.innerText = score;
+
+  tile.style.background = "#00A19D";
+
+  playSound();
+
+  if (Math.random() < 0.3) {
+    people += 1;
+    peopleEl.innerText = people;
+    alert("You helped a family!");
+  }
+
+  updateProgress();
+
+  setTimeout(() => {
+    tile.style.background = "#7ed957";
+  }, 200);
+
+  checkWin();
+}
+
+function updateProgress() {
+  let progress = Math.min(score / 500 * 100, 100);
+  progressFill.style.width = progress + "%";
+}
+
+function checkWin() {
+  if (score >= 500) {
+    document.getElementById("game").style.display = "none";
+    document.getElementById("endScreen").style.display = "block";
+    document.getElementById("finalScore").innerText =
+      "Final Score: " + score + " | People Helped: " + people;
+  }
+}
+
+function restartGame() {
+  score = 0;
+  people = 0;
+  document.getElementById("endScreen").style.display = "none";
+  document.getElementById("game").style.display = "block";
+  scoreEl.innerText = 0;
+  peopleEl.innerText = 0;
+  progressFill.style.width = "0%";
+  createGrid();
+}
+
+/* SOUND */
+function playSound() {
+  let audio = new Audio("https://www.soundjay.com/water/sounds/water-drop-1.mp3");
+  audio.play();
+}
+</script>
+
+</body>
+</html>
